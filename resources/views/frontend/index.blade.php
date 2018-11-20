@@ -19,7 +19,7 @@
                         <div class="caption">
                             <h3> {{ $object->name }}  <small> {{ $object->city->name }} </small> </h3>
                             <p> {{ str_limit($object->description, 100) }} </p>
-                            <p><a href="{{ route('object') }}" class="btn btn-primary" role="button">Details</a></p>
+                            <p><a href="{{ route('object', ['id' => $object->id]) }}" class="btn btn-primary" role="button">Details</a></p>
                         </div>
                     </div>
                 </div>
@@ -29,6 +29,8 @@
         </div>
 
     @endforeach
+
+    {{ $objects->links() }}
 
 </div>
 @endsection
