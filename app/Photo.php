@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Photo extends Model
 {
-    public function photoable(){
+    public function photoable() {
 
         return $this->morphTo();
 
