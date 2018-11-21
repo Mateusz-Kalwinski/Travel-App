@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Enjoythetrip\Interfaces\FrontendRepositoryInterface;
+use App\Enjoythetrip\Gateways\FrontendGateway;
 
 class FrontendController extends Controller
 {
 
-    public function __construct(FrontendRepositoryInterface $frontendRepository) {
+    public function __construct(FrontendRepositoryInterface $frontendRepository, FrontendGateway $frontendGateway) {
         $this->fR = $frontendRepository;
+        $this->fG = $frontendGateway;
     }
 
     public function index() {
@@ -18,9 +20,11 @@ class FrontendController extends Controller
         return view('frontend.index',['objects'=>$objects]);
     }
 
+
     public function article() {
         return view('frontend.article');
     }
+
 
     public function object($id) {
         $object = $this->fR->getObject($id);
@@ -28,16 +32,29 @@ class FrontendController extends Controller
         return view('frontend.object',['object'=>$object]);
     }
 
+
     public function person() {
         return view('frontend.person');
     }
+
 
     public function room() {
         return view('frontend.room');
     }
 
+
     public function roomsearch() {
         return view('frontend.roomsearch');
     }
+
+
+
+    public function searchCities(Request $request) {
+
+        $results = $this->fG->searchCities($request);
+
+        return response()->json($results);
+    }
+
 
 }
