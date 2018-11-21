@@ -31,5 +31,11 @@ class FrontendRepository implements FrontendRepositoryInterface  {
         return  City::where('name', 'LIKE', $term . '%')->get();
     }
 
+    public function getSearchResults(string $city){
+
+        return City::with(['rooms.reservations', 'rooms.photos', 'rooms.object.photos'])->where('name', $city)->first() ?? false;
+
+    }
+
 
 }
