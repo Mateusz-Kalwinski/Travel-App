@@ -2,41 +2,38 @@
 
 @section('content')
 <div class="container places">
-    <h1 class="text-center">Room in <a href="{{ route('object') }}">X</a> object</h1>
+    <h1 class="text-center">Room in <a href="{{ route('object', ['room'=>$room->object_id]) }}">{{$room->object->name}}</a> object</h1>
 
-    <?php for ($i = 1; $i <= 2; $i++): ?>
+    @foreach($room->photos->chunk(3) as $chunked_photos)
 
         <div class="row top-buffer">
 
+            @foreach($chunked_photos as $photo)
+
             <div class="col-md-4">
-                <img class="img-responsive" src="http://lorempixel.com/800/400/nightlife/?x=<?= mt_rand(1, 99999999) ?>" alt="">
+                <img class="img-responsive" src="{{$photo->path ?? $placeholder}}" alt="">
             </div>
-            <div class="col-md-4">
-                <img class="img-responsive" src="http://lorempixel.com/800/400/nightlife/?x=<?= mt_rand(1, 99999999) ?>" alt="">
-            </div>
-            <div class="col-md-4">
-                <img class="img-responsive" src="http://lorempixel.com/800/400/nightlife/?x=<?= mt_rand(1, 99999999) ?>" alt="">
-            </div>
+
+            @endforeach
 
         </div>
 
-    <?php endfor; ?>
+    @endforeach
 
 
     <section>
 
         <ul class="list-group">
             <li class="list-group-item">
-                <span class="bolded">Description:</span> Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Sed porttitor lectus nibh. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rutrum congue leo eget malesuada. Vivamus suscipit tortor eget felis porttitor volutpat. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Sed porttitor lectus nibh. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus.
+                <span class="bolded">Description:</span>{{$room->description}}</li>
+            <li class="list-group-item">
+                <span class="bolded">Room size:</span> {{$room->room_size}}
             </li>
             <li class="list-group-item">
-                <span class="bolded">Room size:</span> 3
+                <span class="bolded">Price per night:</span>{{$room->price}}
             </li>
             <li class="list-group-item">
-                <span class="bolded">Price per night:</span> 150 USD
-            </li>
-            <li class="list-group-item">
-                <span class="bolded">Address:</span> Vestibulum ante ipsum primis
+                <span class="bolded">Address:</span>{{$room->object->city->name}}{{$room->object->address->street}} nr {{$room->object->address->number}}
             </li>
         </ul>
     </section>
@@ -56,7 +53,7 @@
                         <label for="checkout">Check out</label>
                         <input required name="checkout" type="text" class="form-control datepicker" id="checkout" placeholder="">
                     </div>
-                    <button type="submit" class="btn btn-primary">Book</button> 
+                    <button type="submit" class="btn btn-primary">Book</button>
                     <p class="text-danger">There are no vacancies</p>
                 </form>
             </div><br>
@@ -70,3 +67,68 @@
 
 </div>
 @endsection
+
+@push('scripts')
+
+
+<script>
+
+    $.ajax({
+
+        cache: false,
+        url: base_url + '/ajaxGetRoomReservations/' + {{ $room->id }},
+        type: "GET",
+        success: function(response){
+
+
+            var eventDates = {};
+            var dates = ['02/15/2018', '02/16/2018', '02/25/2018'];
+            for (var i = 0; i <= dates.length; i++)
+            {
+                eventDates[ new Date(dates[i])] = new Date(dates[i]);
+            }
+
+
+            $(function () {
+                $("#avaiability_calendar").datepicker({
+                    onSelect: function (data) {
+
+                        //            console.log($('#checkin').val());
+
+                        if ($('#checkin').val() == '')
+                        {
+                            $('#checkin').val(data);
+                        } else if ($('#checkout').val() == '')
+                        {
+                            $('#checkout').val(data);
+                        } else if ($('#checkout').val() != '')
+                        {
+                            $('#checkin').val(data);
+                            $('#checkout').val('');
+                        }
+
+                    },
+                    beforeShowDay: function (date)
+                    {
+                        //console.log(date);
+                        if (eventDates[date])
+                            return [false, 'unavaiable_date'];
+                        else
+                            return [true, ''];
+                    }
+
+
+                });
+            });
+
+
+        }
+
+
+    });
+
+
+
+</script>
+
+@endpush
