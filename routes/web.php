@@ -6,7 +6,10 @@ Route::post(trans('routes.roomsearch'),'FrontendController@roomsearch')->name('r
 Route::get(trans('routes.room'). '/{id}','FrontendController@room')->name('room');
 Route::get(trans('routes.article'),'FrontendController@article')->name('article');
 Route::get(trans('routes.person'),'FrontendController@person')->name('person');
+
 Route::get('/searchCities', 'FrontendController@searchCities');
+
+Route::get('ajaxGetRoomReservations/{id}', 'FrontendController@ajaxGetRoomReservations');
 
 Route::group(['prefix'=>'admin','middleware'=>'auth'],function(){
 
@@ -22,4 +25,4 @@ Route::group(['prefix'=>'admin','middleware'=>'auth'],function(){
 
 Auth::routes();
 
-//Route::get('/home', 'HomeController@index')->name('home');  /* Lecture 7 */
+//Route::get('/home', 'HomeController@index')->name('home');
