@@ -38,8 +38,21 @@ class FrontendController extends Controller
     }
 
 
-    public function room() {
-        return view('frontend.room');
+    public function room($id) {
+
+        $room = $this->fR->getRoom($id);
+
+        return view('frontend.room', ['room'=>$room]);
+    }
+
+    public function ajaxGetRoomReservations($id) {
+
+        $reservations = $this->fR->getReservationsByRoomId($id);
+
+        return response()->json([
+           'reservations'=>$reservations
+        ]);
+
     }
 
 
