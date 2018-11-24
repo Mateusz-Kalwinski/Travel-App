@@ -6,6 +6,8 @@ use App\Enjoythetrip\Interfaces\FrontendRepositoryInterface;
 
 class FrontendGateway {
 
+    use \Illuminate\Foundation\Validation\ValidatesRequests;
+
     public function __construct(FrontendRepositoryInterface $fR ) {
         $this->fR = $fR;
     }
@@ -81,5 +83,14 @@ class FrontendGateway {
 
         }
 
+    }
+
+    public function addComment($commentable_id, $type, $request){
+
+        $this->validate($request, [
+           'content'=>'required|string'
+        ]);
+
+        return $this->fR->addComment($commentable_id, $type, $request);
     }
 }
