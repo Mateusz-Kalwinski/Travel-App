@@ -4,12 +4,15 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 
 class TouristObject extends Model
 {
 
     protected $table = 'objects';
+
+    use Enjoythetrip\Presenters\ObjectPresenter;
 
 
     public function scopeOrdered($query) {
@@ -45,6 +48,12 @@ class TouristObject extends Model
     public function articles() {
 
         return $this->hasMany('App\Article','object_id');
+    }
+
+    public function isLiked() {
+
+        return $this->users()->where('user_id', Auth::user()->id)->exists();
+
     }
 
 
