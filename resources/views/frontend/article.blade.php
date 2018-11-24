@@ -3,21 +3,21 @@
 @section('content')
 <div class="container">
 
-    <h1>Article <small>about: <a href="{{ route('object') }}">X</a> object</small></h1>
-    <p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.</p>
+    <h1>Article <small>about: <a href="{{ route('object',['id'=>$article->object->id]) }}">{{ $article->object->name}}</a> object</small></h1>
+    <p>{{ $article->content}}</p>
 
 
     <a class="btn btn-primary top-buffer" role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-        Article is liked <span class="badge">10</span>
+        Article is liked <span class="badge">{{ $article->users->count()}}</span>
     </a>
     <div class="collapse" id="collapseExample">
         <div class="well">
 
             <ul class="list-inline">
-                <?php for ($i = 1; $i <= 10; $i++): ?>
-                    <li><a href="{{ route('person') }}"><img title="John Doe" class="media-object img-responsive" width="50" height="50" src="http://lorempixel.com/50/50/people/?x=<?= mt_rand(1, 9999999) ?>" alt="..."> </a></li>
+            @foreach( $article->users as $user )
+                <li><a href="{{ route('person',['id'=>$user->id]) }}"><img title="{{ $user->FullName}}" class="media-object img-responsive" width="50" height="50" src="{{ $user->photos->first()->path ?? $placeholder }}" alt="..."> </a></li>
 
-                <?php endfor; ?>
+            @endforeach
             </ul>
 
 
@@ -26,31 +26,48 @@
 
     <h3>Comments</h3>
 
-    <?php for ($j = 1; $j <= 4; $j++): ?>
-        <div class="media">
-            <div class="media-left media-top">
-                <a href="{{ route('person') }}">
-                    <img class="media-object" width="50" height="50" src="http://lorempixel.com/50/50/people/?x=<?= mt_rand(1, 9999999) ?>" alt="...">
-                </a>
-            </div>
-            <div class="media-body">
-                Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.
-
-            </div>
+@foreach( $article->comments as $comment )
+    <div class="media">
+        <div class="media-left media-top">
+            <a href="{{ route('person',['id'=>$comment->user->id]) }}">
+                <img class="media-object" width="50" height="50" src="{{ $comment->user->photos->first()->path ?? $placeholder}}" alt="...">
+            </a>
         </div>
-        <hr>
-    <?php endfor; ?>
+        <div class="media-body">
+            {{ $comment->content}}
+        </div>
+    </div>
+    <hr>
+@endforeach
 
-    <a href="#" class="btn btn-primary btn-xs">Like this article</a><br><br>
+    @auth
 
-    <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2">
-        Add comment
-    </a>
+        @if($article->isLiked())
+            <a href="{{route('unlike', ['id'=>$article->id, 'type'=> 'App\Article'])}}" class="btn btn-primary btn-xs top-buffer">Unlike this article</a>
+        @else
+            <a href="{{route('like', ['id'=>$article->id, 'type'=> 'App\Article'])}}" class="btn btn-primary btn-xs top-buffer">Like this article</a>
+        @endif
+
+    @else
+
+        <p><a href="{{route('login')}}">Login to like this article</a></p>
+
+    @endauth
+
+
+    @auth
+
+        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2">
+            Add comment
+        </a>
+    @else
+        <p><a href="{{route('login')}}">Login to add comment</a></p>
+    @endauth
     <div class="collapse" id="collapseExample2">
         <div class="well">
 
 
-            <form method="POST" class="form-horizontal">
+            <form method="POST" action="{{route('addComment', ['article_id' => $article->id, 'App\Article'])}}" class="form-horizontal">
                 <fieldset>
 
                     <div class="form-group">
@@ -67,6 +84,7 @@
                         </div>
                     </div>
                 </fieldset>
+                @csrf
             </form>
 
         </div>

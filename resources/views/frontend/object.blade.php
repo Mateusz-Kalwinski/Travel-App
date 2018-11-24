@@ -37,7 +37,7 @@
 
             <ul class="list-inline">
             @foreach( $object->users as $user)
-                <li><a href="{{ route('person') }}"><img title="{{ $user->FullName }}" class="media-object img-responsive" width="50" height="50" src="{{ $user->photos->first()->path ?? $placeholder }}" alt="..."> </a></li>
+                <li><a href="{{ route('person', ['id'=>$user->id]) }}"><img title="{{ $user->FullName }}" class="media-object img-responsive" width="50" height="50" src="{{ $user->photos->first()->path ?? $placeholder }}" alt="..."> </a></li>
 
             @endforeach
             </ul>
@@ -85,7 +85,7 @@
     @foreach( $object->comments as $comment )
         <div class="media">
             <div class="media-left media-top">
-                <a title="{{ $comment->user->FullName }}" href="{{ route('person') }}">
+                <a title="{{ $comment->user->FullName }}" href="{{ route('person' ,['id'=>$comment->user->id]) }}">
                     <img class="media-object" width="50" height="50" src="{{ $comment->user->photos->first()->path ?? $placeholder  }}" alt="...">
                 </a>
             </div>
@@ -98,14 +98,20 @@
     @endforeach
     </section>
 
+    @auth
+
     <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
         Add comment
     </a>
+    @else
+        <p><a href="{{route('login')}}">Login to add comment</a></p>
+    @endauth
+
     <div class="collapse" id="collapseExample">
         <div class="well">
 
 
-            <form method="POST" class="form-horizontal">
+            <form method="POST" action="{{route('addComment', ['object_id'=>$object->id, 'App\TouristObject'])}}" class="form-horizontal">
                 <fieldset>
                     <div class="form-group">
                         <label for="textArea" class="col-lg-2 control-label">Comment</label>
@@ -133,6 +139,7 @@
                         </div>
                     </div>
                 </fieldset>
+                @csrf
             </form>
 
         </div>
@@ -146,13 +153,27 @@
             <p><b> {{ $article->user->FullName }} </b>
                 <i>{{ $article->created_at }} </i>
             </p>
-            <p>{{ str_limit($article->content,250) }}  </p> <a href="{{ route('article') }}">More</a>
+            <p>{{ str_limit($article->content,250) }}  </p> <a href="{{ route('article', ['id'=>$article->id]) }}">More</a>
         </div>
 
     @endforeach
     </section>
 
-    <a href="#" class="btn btn-primary btn-xs top-buffer">Like this object</a>
+    @auth
+
+
+        @if($object->isLiked())
+            <a href="{{route('unlike', ['id'=>$object->id, 'type'=> 'App\TouristObject'])}}" class="btn btn-primary btn-xs top-buffer">Unlike this object</a>
+        @else
+            <a href="{{route('like', ['id'=>$object->id, 'type'=> 'App\TouristObject'])}}" class="btn btn-primary btn-xs top-buffer">Like this object</a>
+        @endif
+
+    @else
+
+        <p><a href="{{route('login')}}">Login to like this object</a></p>
+
+    @endauth
+
 </div>
 @endsection
 
