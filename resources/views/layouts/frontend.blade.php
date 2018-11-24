@@ -42,10 +42,8 @@
         @auth
             <ul class="nav navbar-nav">
                 <li><p class="navbar-text">Logged in as:</p></li>
-                <li><p class="navbar-text">{{ Auth::user()->name }}</p></li>
+                <li><a href="{{route('person',['id'=> Auth::user()->id])}}" class="navbar-text">{{ Auth::user()->name}}</a></li>
                 <li><a href="{{ route('adminHome') }}">admin</a></li>
-
-
                 <li>
                     <a class="dropdown-item" href="{{ route('logout') }}"
                        onclick="event.preventDefault();
