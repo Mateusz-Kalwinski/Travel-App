@@ -102,7 +102,7 @@
             </div>
             <button type="submit" class="btn btn-warning">Search</button>
 
-            {{ csrf_field() }}
+            @csrf
 
         </form>
 
