@@ -26,7 +26,6 @@
                                 </div>
                             </div>
 
-                            <!-- Lecture 7 -->
                             <div class="form-group row">
                                 <label for="surname" class="col-md-4 col-form-label text-md-right">Surname</label>
 
