@@ -2,6 +2,7 @@
 
 namespace App\Enjoythetrip\Repositories;
 
+
 use App\Enjoythetrip\Interfaces\FrontendRepositoryInterface;
 use App\{Article, Comment, Reservation, TouristObject, City, Room, User};
 
@@ -85,6 +86,19 @@ class FrontendRepository implements FrontendRepositoryInterface  {
         $comment->user_id = $request->user()->id;
 
         return $commentable->comments()->save($comment);
+
+    }
+
+    public function makeReservation($room_id, $city_id, $request) {
+
+        return Reservation::create([
+            'user_id'=>$request->user()->id,
+            'city_id' => $city_id,
+            'room_id' => $room_id,
+            'status' => 0,
+            'day_in' => date('Y-m-d', strtotime($request->input('checkin'))),
+            'day_out' => date('Y-m-d', strtotime($request->input('checkout'))),
+        ]);
 
     }
 
