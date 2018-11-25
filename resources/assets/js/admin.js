@@ -1,77 +1,94 @@
-/*The MIT License (MIT)
 
-Copyright (c) 2017 www.netprogs.pl
+function datesBetween(startDt, endDt) {
+    var between = [];
+    var currentDate = new Date(startDt);
+    var end = new Date(endDt);
+    while (currentDate <= end) {
+        between.push( $.datepicker.formatDate('mm/dd/yy',new Date(currentDate)) );
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.*/
-
-var eventDates = {};
-var datesConfirmed = ['12/12/2017', '12/13/2017', '12/14/2017'];
-var datesnotConfirmed = ['12/20/2017', '12/21/2017', '12/22/2017', '12/25/2017'];
-
-
-for (var i = 0; i < datesConfirmed.length; i++)
-{
-    eventDates[ datesConfirmed[i] ] = 'confirmed';
-}
-
-var tmp = {};
-for (var i = 0; i < datesnotConfirmed.length; i++)
-{
-    tmp[ datesnotConfirmed[i] ] = 'notconfirmed';
+    return between;
 }
 
 
-Object.assign(eventDates, tmp);
 
 
-$(function () {
-    $(".reservation_calendar").datepicker({
-        onSelect: function (data) {
+var Ajax = {
 
-            var a = $(this).attr('id');
+    get: function (url, success, data = null, beforeSend = null) {
 
-            $('.hidden_' + a).hide();
-            $('.loader_' + a).show();
+        $.ajax({
 
-            setTimeout(function () {
+            cache: false,
+            url: base_url + '/' + url,
+            type: "GET",
+            data: data,
+            success: function(response){
 
-                $('.loader_' + a).hide();
-                $('.hidden_' + a).show();
+                App[success](response);
 
-            }, 1000);
+            },
+            beforeSend: function(){
 
-        },
-        beforeShowDay: function (date)
+                if(beforeSend)
+                    App[beforeSend]();
+
+            }
+
+        });
+    }
+
+
+};
+
+
+var App = {
+
+
+    GetReservationData: function (id, calendar_id, date) {
+
+        App.calendar_id = calendar_id;
+        Ajax.get('ajaxGetReservationData?fromWebApp=1', 'AfterGetReservationData',{room_id: id, date: date},'BeforeGetReservationData');
+
+
+    },
+    BeforeGetReservationData: function() {
+
+
+        $('.loader_' + App.calendar_id).hide();
+        $('.hidden_' + App.calendar_id).show();
+
+
+    },
+    AfterGetReservationData: function(response) {
+
+
+        $('.hidden_' + App.calendar_id + " .reservation_data_room_number").html(response.room_number);
+
+        $('.hidden_' + App.calendar_id + " .reservation_data_day_in").html(response.day_in);
+        $('.hidden_' + App.calendar_id + " .reservation_data_day_out").html(response.day_out);
+        $('.hidden_' + App.calendar_id + " .reservation_data_person").html(response.FullName);
+        $('.hidden_' + App.calendar_id + " .reservation_data_person").attr('href', response.userLink);
+        $('.hidden_' + App.calendar_id + " .reservation_data_delete_reservation").attr('href', response.deleteResLink);
+
+
+        if (response.status)
         {
-            var tmp = eventDates[ $.datepicker.formatDate('mm/dd/yy', date)];
-//            console.log(tmp);
-            if (tmp)
-            {
-                if (tmp == 'confirmed')
-                    return [true, 'reservationconfirmed'];
-                else
-                    return [true, 'reservationnotconfirmed'];
-            } else
-                return [false, ''];
+            $('.hidden_' + App.calendar_id + " .reservation_data_confirm_reservation").removeAttr('href');
+            $('.hidden_' + App.calendar_id + " .reservation_data_confirm_reservation").attr('disabled', 'disabled');
 
+        } else
+        {
+            $('.hidden_' + App.calendar_id + " .reservation_data_confirm_reservation").attr('href', response.confirmResLink);
         }
 
 
-    });
-});
+    }
+
+
+};
+
+$(document).on('click', '.dropdown', function (e) {
+    e.stopPropagation();
+})
