@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements \Tymon\JWTAuth\Contracts\JWTSubject
 {
     use Notifiable;
     use Enjoythetrip\Presenters\UserPresenter;
@@ -30,6 +30,16 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
 
     public function objects() {
 
@@ -52,6 +62,12 @@ class User extends Authenticatable
     public function comments(){
 
         return $this->hasMany('App\Comment');
+
+    }
+
+    public function unotifications(){
+
+        return $this->hasMany('App\Notification');
 
     }
 

@@ -7,11 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 
-
 class Article extends Model
 {
 
     use Enjoythetrip\Presenters\ArticlePresenter;
+
+    protected $guarded = [];
+    public $timestamps = false;
+
 
     public function user() {
 
@@ -25,7 +28,7 @@ class Article extends Model
 
     }
 
-    public function comments() {
+    public function comments(){
 
         return $this->morphMany('App\Comment', 'commentable');
 
@@ -33,7 +36,7 @@ class Article extends Model
 
     public function object() {
 
-        return $this->belongsTo('App\TouristObject', 'object_id');
+        return $this->belongsTo('App\TouristObject','object_id');
 
     }
 
