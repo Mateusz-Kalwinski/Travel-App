@@ -26,4 +26,30 @@ trait Ajax {
     }
 
 
+
+    public function ajaxSetReadNotification(Request $request)
+    {
+        return  $this->bR->setReadNotifications($request);
+    }
+
+
+
+    public function ajaxGetNotShownNotifications(Request $request)
+    {
+
+        $currentmodif = $this->bG->checkNotificationsStatus($request);
+
+        $response['notifications'] = $this->bR->getUserNotifications($request->user()->id);
+        $response['timestamp'] = $currentmodif;
+
+        return json_encode($response);
+    }
+
+
+    public function ajaxSetShownNotifications(Request $request)
+    {
+        return $this->bR->setShownNotifications($request);
+    }
+
+
 }
