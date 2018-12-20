@@ -18,4 +18,24 @@ class Controller extends BaseController
         Session::flash('alert-class', 'alert-'.$class);
 
     }
+
+    protected function setMiddleware()
+    {
+        if( \Request::Ajax() && !\Request::has('fromWebApp') )
+            $middleware = 'jwt.auth';
+        else
+            $middleware = 'auth';
+
+        return $middleware;
+    }
+
+    protected function makeResponse($view, $objects = [])
+    {
+        if (\Request::ajax())
+        {
+            return \Response::json($objects);
+        }
+
+        return view($view, $objects);
+    }
 }
