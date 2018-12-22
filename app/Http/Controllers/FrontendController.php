@@ -2,87 +2,102 @@
 
 namespace App\Http\Controllers;
 
-use http\Env\Response;
 use Illuminate\Http\Request;
 use App\Enjoythetrip\Interfaces\FrontendRepositoryInterface;
 use App\Enjoythetrip\Gateways\FrontendGateway;
+use App\Events\OrderPlacedEvent;
+use Illuminate\Support\Facades\Cache;
 
 class FrontendController extends Controller
 {
 
-    public function __construct(FrontendRepositoryInterface $frontendRepository, FrontendGateway $frontendGateway) {
+    public function __construct(FrontendRepositoryInterface $frontendRepository, FrontendGateway $frontendGateway )
+    {
 
-        $this->middleware('auth')->only(['makeReservation', 'addComment', 'like', 'unlike']);
+        $this->middleware($this->setMiddleware())->only(['makeReservation','addComment','like','unlike']);
 
         $this->fR = $frontendRepository;
         $this->fG = $frontendGateway;
     }
 
-    public function index() {
+
+    public function index()
+    {
         $objects = $this->fR->getObjectsForMainPage();
 
-        return view('frontend.index',['objects'=>$objects]);
+        return $this->makeResponse('frontend.index',compact('objects'));
     }
 
 
-    public function article($id) {
-
+    public function article($id)
+    {
         $article = $this->fR->getArticle($id);
-
-        return view('frontend.article', compact('article'));
+        return $this->makeResponse('frontend.article',compact('article'));
     }
 
 
-    public function object($id) {
-
+    public function object($id)
+    {
         $object = $this->fR->getObject($id);
-
-        return view('frontend.object',['object'=>$object]);
+        return $this->makeResponse('frontend.object',compact('object'));
     }
 
 
-    public function person($id) {
-
+    public function person($id)
+    {
         $user = $this->fR->getPerson($id);
-
         return view('frontend.person', ['user'=>$user]);
-
     }
 
 
-    public function room($id) {
-
+    public function room($id )
+    {
         $room = $this->fR->getRoom($id);
-
-        return view('frontend.room', ['room'=>$room]);
+        return $this->makeResponse('frontend.room',compact('room'));
     }
 
-    public function ajaxGetRoomReservations($id) {
+
+
+    public function ajaxGetRoomReservations($id)
+    {
 
         $reservations = $this->fR->getReservationsByRoomId($id);
 
         return response()->json([
-           'reservations'=>$reservations
+            'reservations'=>$reservations
         ]);
-
     }
 
 
-    public function roomsearch(Request $request) {
+    public function roomsearch(Request $request )
+    {
 
-        if ($city = $this->fG->getSearchResults($request)){
-            dd($city);
-            return view('frontend.roomsearch', ['city' => $city]);
-        }else{
+        if($city = $this->fG->getSearchResults($request))
+        {
+            return $this->makeResponse('frontend.roomsearch',compact('city'));
+        }
+        else
+        {
             if (!$request->ajax())
-                return redirect('/')->with('norooms',__('No offers were found matching the criteria'));
+                return redirect('/')->with('norooms', __('No offers were found matching the criteria'));
         }
     }
 
 
-    public function searchCities(Request $request) {
+
+    public function searchCities(Request $request)
+    {
 
         $results = $this->fG->searchCities($request);
+
+        return response()->json($results);
+    }
+
+
+    public function cities()
+    {
+
+        $results = $this->fR->cities();
 
         return response()->json($results);
     }
@@ -92,51 +107,63 @@ class FrontendController extends Controller
     {
         $this->fR->like($likeable_id, $type, $request);
 
+        Cache::flush();
+
         return redirect()->back();
     }
+
 
 
     public function unlike($likeable_id, $type, Request $request)
     {
         $this->fR->unlike($likeable_id, $type, $request);
 
+        Cache::flush();
+
         return redirect()->back();
     }
 
 
-    public function addComment($commentable_id, $type, Request $request){
 
+    public function addComment($commentable_id, $type, Request $request)
+    {
         $this->fG->addComment($commentable_id, $type, $request);
 
+        Cache::flush();
+
         return redirect()->back();
     }
 
-    public function makeReservation($room_id, $city_id, Request $request) {
+
+
+    public function makeReservation($room_id, $city_id, Request $request)
+    {
 
         $avaiable = $this->fG->checkAvaiableReservations($room_id, $request);
 
-        if (!$avaiable) {
-
-            if (!$request->ajax()){
-
+        if(!$avaiable)
+        {
+            if (!$request->ajax())
+            {
                 $request->session()->flash('reservationMsg', __('There are no vacancies'));
-                return redirect()->route('room', ['id'=>$room_id, '#reservation']);
-
+                return redirect()->route('room',['id'=>$room_id,'#reservation']);
             }
 
             return response()->json(['reservation'=>false]);
-
-        }else {
-
+        }
+        else
+        {
             $reservation = $this->fG->makeReservation($room_id, $city_id, $request);
 
+            event( new OrderPlacedEvent($reservation) );
+
             if (!$request->ajax())
-            return redirect()->route('adminHome');
+                return redirect()->route('adminHome');
             else
                 return response()->json(['reservation'=>$reservation]);
-
         }
 
     }
+
 
 }
