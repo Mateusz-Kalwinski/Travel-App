@@ -10,4 +10,8 @@ return [
   'saveobject' => 'zapiszobjekt',
   'profile' => 'profil',
   'saveroom' => 'zapiszpokoj',
+  'deleteobject' => 'usunobiekt',
+  'deleteroom' => 'usunpokoj',
+
+
 ];

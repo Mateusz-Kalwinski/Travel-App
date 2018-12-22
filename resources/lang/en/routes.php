@@ -10,4 +10,6 @@ return [
     'saveobject' => 'saveobject',
     'profile' => 'profile',
     'saveroom' => 'saveroom',
+    'deleteobject' => 'deleteobject',
+    'deleteroom' => 'deleteroom',
 ];
