@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <script src="cordova.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <link href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" media="all" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/smoothness/jquery-ui.css"/>
+
+
+    <link rel="stylesheet" href="http://cdn.rawgit.com/arschmitz/jquery-mobile-datepicker-wrapper/v0.1.1/jquery.mobile.datepicker.css"/>
+    <script src="http://cdn.rawgit.com/jquery/jquery-ui/1.10.4/ui/jquery.ui.datepicker.js"></script>
+    <script id="mobile-datepicker" src="http://cdn.rawgit.com/arschmitz/jquery-mobile-datepicker-wrapper/v0.1.1/jquery.mobile.datepicker.js"></script>
+
+    <link href="css/styles.css" rel="stylesheet"/>
+
+    <script>
+        var _app = {
+            // Application Constructor
+            initialize: function() {
+                document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
+            },
+
+            // deviceready Event Handler
+            //
+            // Bind any cordova events here. Common events are:
+            // 'pause', 'resume', etc.
+            onDeviceReady: function() {
+                this.receivedEvent('deviceready');
+            },
+
+            // Update DOM on a Received Event
+            receivedEvent: function(id) {
+                var parentElement = document.getElementById(id);
+                var listeningElement = parentElement.querySelector('.listening');
+                var receivedElement = parentElement.querySelector('.received');
+
+                listeningElement.setAttribute('style', 'display:none;');
+                receivedElement.setAttribute('style', 'display:block;');
+
+                console.log('Received Event: ' + id);
+            }
+        };
+
+        _app.initialize();
+
+
+
+        var Ajax = {
+
+
+            go: function ( type, url, data, success, beforeSend, complete, error ) {
+
+                $.ajax({
+
+                    cache: false,
+                    url: App.BaseUrl  + url + '?token=' + App.GetAuthToken(),
+                    type: type,
+                    dataType: "json",
+                    data: data,
+                    success: function(response){
+
+                        if(success)
+                            App[success](response);
+
+                    },
+                    beforeSend: function(xhr){
+
+                        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                        if(beforeSend)
+                            App[beforeSend](xhr);
+
+                    },
+                    error: function(){
+
+                        if(error)
+                            App[error]();
+
+                    },
+                    complete: function(){
+
+                        if(complete)
+                            App[complete]();
+
+                    }
+
+                });
+            }
+
+
+
+        };
+
+
+    </script>
+    <script src="js/app.js"></script>
+    <script src="js/html.js"></script> 
+    <script src="js/control.js"></script>
+
+    <title>Enjoy the trip!</title>
+
+
+</head>
+<body>
+
+
+<div data-role="page" id="homepage">
+
+    <div data-role="main" class="ui-content">
+
+        <div data-role="header" id="header">
+            <h1 id="header-text">Objects list</h1>
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#homepage" data-transition="none">Home</a></li>
+                    <li><a href="#adminpage" data-transition="none">Admin </a></li>
+                    <li><a href="#loginpage" data-transition="none" id="loginhref">Sign in</a></li>
+                </ul>
+            </div>
+        </div>
+
+
+        <form class="ui-filterable">
+                <input id="inset-autocomplete-input" name="city" data-type="search" placeholder="Search city...">
+        </form>
+        <ul data-role="listview" id="citysearchresults" data-inset="true" data-filter="true" data-filter-reveal="true" data-input="#inset-autocomplete-input">
+            <li><a href="#">Chicago</a></li>
+            <li><a href="#">Melbourne</a></li>
+            <li><a href="#">Kuala Lumpur</a></li>
+        </ul>
+
+        <label for="checkin">Check in:</label>
+        <input type="text" name="checkin" id="checkin" data-role="date" value="">
+        <label for="checkout">Check out:</label>
+        <input type="text" name="checkout" id="checkout" data-role="date" value="">
+
+        <label for="select-choice-1" class="select">Room size:</label>
+        <select name="room_size" id="select-choice-1">
+            <option>Room size</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+
+        <label for="submit-search-rooms">Search object:</label>
+        <button type="submit" id="submit-search-rooms" class="ui-shadow ui-btn ui-corner-all ui-mini">Search</button>
+
+
+
+        <h1>Interesting places</h1>
+        <ul data-role="listview" data-inset="true">
+            <li><a href="#objectdetails" data-transition="none">
+                <img  alt="" src="img/placeholder.jpg">
+                <h2>Broken Bells <small>Prague</small></h2>
+                <p>Object description</p></a>
+            </li>
+            <li><a href="#objectdetails" data-transition="none">
+                <img  alt="" src="img/placeholder.jpg">
+                <h2>Broken Bells <small>Prague</small></h2>
+                <p>Object description</p></a>
+            </li>
+            <li><a href="#objectdetails" data-transition="none">
+                <img  alt="" src="img/placeholder.jpg">
+                <h2>Broken Bells <small>Prague</small></h2>
+                <p>Object description</p></a>
+            </li>
+        </ul>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+<div data-role="page" id="objectdetails">
+
+    <div data-role="main" class="ui-content">
+
+        <a href="#" class="ui-btn" data-rel="back">Back to the list of objects</a>
+
+        <div id="objectdata">
+
+            <h1>X object <small>address</small></h1>
+            <p>Id ut nostrum ipsam quis dicta sed maxime. Natus quibusdam beatae qui placeat nulla doloremque.</p>
+            <p>Available rooms in the object:</p>
+
+            <ul data-role="listview" data-split-icon="gear" data-split-theme="a" data-inset="true">
+                <li><a href="#room" data-transition="none">
+                    <img alt="" src="img/placeholder.jpg">
+                    <h2>Room 17 <small>Miami</small></h2>
+                    <p>Room description</p>
+                </a>
+                </li>
+                <li><a href="#room" data-transition="none">
+                    <img alt="" src="img/placeholder.jpg">
+                    <h2>Room 17 <small>Miami</small></h2>
+                    <p>Room description</p>
+                </a>
+                </li>
+                <li><a href="#room" data-transition="none">
+                    <img alt="" src="img/placeholder.jpg">
+                    <h2>Room 17 <small>Miami</small></h2>
+                    <p>Room description</p>
+                </a>
+                </li>
+            </ul>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div data-role="page" id="room">
+
+    <div data-role="main" class="ui-content">
+        <a href="#" class="ui-btn" data-rel="back">Back to the list of rooms</a>
+
+
+        <div id="roomdata">
+            <ul data-role="listview" data-inset="true">
+                <li data-role="list-divider">Room number 12 in X object</li>
+                <li>
+                    <h2>Room size: 3, price 250$</h2>
+                    <p><strong>Room address</strong></p>
+                    <p>Room description</p>
+                </li>
+            </ul>
+        </div>
+
+        <label for="day_in">Check in:</label>
+        <input type="text" name="day_in" id="day_in" data-role="date" value="">
+
+        <label for="day_out">Check out:</label>
+        <input type="text" name="day_out" id="day_out" data-role="date" value="">
+
+        <label for="submit-reservation">Book a room:</label>
+        <button type="submit" id="submit-reservation" class="ui-shadow ui-btn ui-corner-all ui-mini">Book</button>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+<div data-role="page" id="adminpage">
+    <div data-role="panel" id="notifications">
+        <ul>
+            <li><a href="#">A reservation was made for room 12 in the Optio object. Check in 08/03/2017 , check out 08/06/2017</a></li>
+            <li><a href="#">A reservation was made for room 12 in the Optio object. Check in 08/03/2017 , check out 08/06/201</a></li>
+            <li><a href="#">A reservation was made for room 12 in the Optio object. Check in 08/03/2017 , check out 08/06/201</a></li>
+            <li><a href="#">A reservation was made for room 12 in the Optio object. Check in 08/03/2017 , check out 08/06/201</a></li>
+        </ul>
+    </div>
+
+    <div data-role="main" class="ui-content">
+        <div id="user-reservations">
+            <ul data-role="listview" data-inset="true">
+
+                <li data-role="list-divider">Voluptatem object</li>
+                <li>
+                    <h2>Room 18</h2>
+                    <p>Check in: 08/14/2017</p>
+                    <p>Check out: 08/30/2017</p>
+                    <p>Guest: John Doe</p>
+                    <p>Confirmed <a class="deleteReservation ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-id="1">Delete</a></p>
+                    <p>Check in: 08/14/2017</p>
+                    <p>Check out: 08/30/2017</p>
+                    <p>Guest: John Doe</p>
+                    <p>Confirmed <a class="deleteReservation ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-id="1">Delete</a></p>
+                </li>
+                <li>
+                    <h2>Room 20</h2>
+                    <p>Check in: 08/14/2017</p>
+                    <p>Check out: 08/30/2017</p>
+                    <p>Guest: John Doe</p>
+                    <p>Confirmed <a class="deleteReservation ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-id="1">Delete</a></p>
+                </li>
+
+
+
+                <li data-role="list-divider">Optio object</li>
+                <li>
+                    <h2>Room 18</h2>
+                    <p>Check in: 08/14/2017</p>
+                    <p>Check out: 08/30/2017</p>
+                    <p>Guest: John Doe</p>
+                    <p><a href="#">Confirm</a> <a class="deleteReservation ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-id="1">Delete</a></p>
+                </li>
+                <li>
+                    <h2>Room 20</h2>
+                    <p>Check in: 08/14/2017</p>
+                    <p>Check out: 08/30/2017</p>
+                    <p>Guest: John Doe</p>
+                    <p>Confirmed <a class="deleteReservation ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-id="1">Delete</a></p>
+                </li>
+
+            </ul>
+        </div>
+
+
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div data-role="page" id="loginpage">
+
+    <div data-role="main" class="ui-content">
+
+        <label for="email">Email address</label>
+        <input type="email" name="email" id="email" value="">
+
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" value="">
+
+        <label for="submit-login">Log in</label>
+        <button type="submit" id="submit-login" class="ui-shadow ui-btn ui-corner-all ui-mini">Log in</button>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -8,10 +8,13 @@ use App\{Article, Comment, Reservation, TouristObject, City, Room, User};
 
 class FrontendRepository implements FrontendRepositoryInterface  {
 
+
     public function getObjectsForMainPage()
     {
-        // return TouristObject::all();
-        return TouristObject::with(['city','photos'])->ordered()->paginate(8);
+        if(\Illuminate\Support\Facades\Request::ajax())
+            return  TouristObject::with(['city','photos'])->ordered()->get();
+        else
+            return  TouristObject::with(['city','photos'])->ordered()->paginate(8);
     }
 
     public function getObject($id)
@@ -25,6 +28,11 @@ class FrontendRepository implements FrontendRepositoryInterface  {
     public function getSearchCities( string $term)
     {
         return  City::where('name', 'LIKE', $term . '%')->get();
+    }
+
+    public function cities()
+    {
+        return City::all();
     }
 
     public function getSearchResults(string $city){

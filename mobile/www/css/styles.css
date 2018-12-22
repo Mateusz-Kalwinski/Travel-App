@@ -1,0 +1,17 @@
+.ui-listview .ui-li-has-thumb>img:first-child, .ui-listview .ui-li-has-thumb>.ui-btn>img:first-child, .ui-listview .ui-li-has-thumb .ui-li-thumb {
+max-width: none;
+position: relative;
+}
+
+
+.ui-listview>.ui-li-has-thumb>.ui-btn, .ui-listview>.ui-li-static.ui-li-has-thumb {
+padding-left: 0;
+}
+
+#notifications ul {
+list-style-type: none;
+}
+
+#notifications ul li {
+margin-bottom: 15px;
+}
