@@ -44,7 +44,7 @@
 
         <div class="row">
             <div class="col-md-6">
-                <form {{ novalidate }} method="POST" action="{{route('makeReservation', ['room_id'=>$room->id, 'city_id' => $room->object->city->id])}}">
+                <form {{ $novalidate }} method="POST" action="{{route('makeReservation', ['room_id'=>$room->id, 'city_id' => $room->object->city->id])}}">
                     <div class="form-group">
                         <label for="checkin">Check in</label>
                         <input required name="checkin" type="text" class="form-control datepicker" id="checkin" placeholder="">
