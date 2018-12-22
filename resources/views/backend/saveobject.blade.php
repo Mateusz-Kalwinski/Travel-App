@@ -1,41 +1,55 @@
 @extends('layouts.backend')
 
 @section('content')
-<h2>Adding a new object / editing</h2>
-<form method="POST" enctype="multipart/form-data" class="form-horizontal">
+
+@if( $object ?? false )
+<h2>Editing object {{ $object->name }}</h2>
+@else
+    <h2>Adding a new object</h2>
+@endif
+
+<form {{ $novalidate }} method="POST" enctype="multipart/form-data" class="form-horizontal" action="{{ route('saveObject',['id'=>$object->id ?? null]) }}">
     <fieldset>
         <div class="form-group">
             <label for="city" class="col-lg-2 control-label">City *</label>
             <div class="col-lg-10">
+
                 <select name="city" class="form-control" id="city">
-                    <option>Washington</option>
-                    <option>Krakow</option>
-                    <option>Moscow</option>
+
+                    @foreach($cities as $city)
+                        @if( ($object ?? false) && $object->city->id == $city->id )
+                            <option selected value="{{ $city->id }}">{{ $city->name }}</option>
+                        @else
+                            <option value="{{ $city->id }}">{{ $city->name }}</option>
+                        @endif
+                    @endforeach
+
                 </select>
+
             </div>
         </div>
         <div class="form-group">
             <label for="name" class="col-lg-2 control-label">Name *</label>
             <div class="col-lg-10">
-                <input name="name" required type="text" class="form-control" id="name" placeholder="">
+                <input name="name" required type="text" value="{{ $object->name ?? old('name') }}" class="form-control" id="name" placeholder="">
             </div>
         </div>
         <div class="form-group">
             <label for="street" class="col-lg-2 control-label">Street *</label>
             <div class="col-lg-10">
-                <input name="street" required type="text" class="form-control" id="street" placeholder="">
+                <input name="street" required type="text" value="{{ $object->address->street ?? old('street') }}" class="form-control" id="street" placeholder="">
             </div>
         </div>
         <div class="form-group">
             <label for="number" class="col-lg-2 control-label">Number *</label>
             <div class="col-lg-10">
-                <input name="number" required type="number" class="form-control" id="number" placeholder="">
+                <input name="number" required type="number" value="{{ $object->address->number ?? old('number') }}" class="form-control" id="number" placeholder="">
             </div>
         </div>
         <div class="form-group">
             <label for="descr" class="col-lg-2 control-label">Object description *</label>
             <div class="col-lg-10">
-                <textarea name="description" required class="form-control" rows="3" id="descr"></textarea>
+                <textarea name="description" required class="form-control" rows="3" id="descr">{{ $object->description ?? old('description') }}</textarea>
             </div>
         </div>
         <div class="form-group">
@@ -46,45 +60,47 @@
             </div>
         </div>
 
+    @if( $object ?? false )
         <div class="col-lg-10 col-lg-offset-2">
 
-            <?php for ($i = 1; $i <= 2; $i++): ?>
+        @foreach( $object->photos->chunk(4) as $chunked_photos )
 
-                <div class="row">
+            <div class="row">
 
 
-                    <?php for ($j = 1; $j <= 4; $j++): ?>
+            @foreach( $chunked_photos as $photo )
 
-                        <div class="col-md-3 col-sm-6">
-                            <div class="thumbnail">
-                                <img class="img-responsive" src="http://lorempixel.com/275/150/city/?x=<?= mt_rand(1, 9999999) ?>" alt="...">
-                                <div class="caption">
-                                    <p><a href="#" class="btn btn-primary btn-xs" role="button">Delete</a></p>
-                                </div>
-
-                            </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="thumbnail">
+                        <img class="img-responsive" src="{{ $photo->path ?? $placeholder }}" alt="...">
+                        <div class="caption">
+                            <p><a href="{{ route('deletePhoto',['id'=>$photo->id]) }}" class="btn btn-primary btn-xs" role="button">Delete</a></p>
                         </div>
 
-                    <?php endfor; ?>
-
+                    </div>
                 </div>
 
+            @endforeach
 
-            <?php endfor; ?>
+            </div>
+
+
+        @endforeach
 
         </div>
 
         <div class="col-lg-10 col-lg-offset-2">
             Articles:
             <ul class="list-group">
-                <?php for ($i = 1; $i <= 6; $i++): ?>
-                    <li class="list-group-item">
-                        Title <a href="">delete</a>
-                    </li>
-                <?php endfor; ?>
+            @foreach( $object->articles as $article )
+                <li class="list-group-item">
+                    {{ $article->title }} <a href="{{ route('deleteArticle',['id'=>$article->id]) }}">delete</a>
+                </li>
+            @endforeach
 
             </ul>
         </div>
+    @endif
 
         <div class="form-group">
             <div class="col-lg-10 col-lg-offset-2">
@@ -93,24 +109,25 @@
         </div>
 
     </fieldset>
+    @csrf
 </form>
 
 <div class="col-lg-10 col-lg-offset-2">
 
-    <form method="POST" class="form-horizontal">
+    <form {{$novalidate}} method="POST" class="form-horizontal" action="{{ route('saveArticle',['id'=>$object->id ?? null])}}">
         <fieldset>
 
             <div class="form-group">
                 <label for="textTitle" class="col-lg-2 control-label">Title *</label>
                 <div class="col-lg-10">
-                    <input name="title" required type="text" class="form-control" id="textTitle" placeholder="">
+                    <input name="title" value="{{ old('title') }}" required type="text" class="form-control" id="textTitle" placeholder="">
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="textArea" class="col-lg-2 control-label">Content *</label>
                 <div class="col-lg-10">
-                    <textarea name="content" required class="form-control" rows="3" id="textArea"></textarea>
+                    <textarea name="content" required class="form-control" rows="3" id="textArea">{{ old('content')}}</textarea>
                     <span class="help-block">Add an article about this object.</span>
                 </div>
             </div>
@@ -121,6 +138,7 @@
                 </div>
             </div>
         </fieldset>
+        @csrf
     </form>
 
 </div>
