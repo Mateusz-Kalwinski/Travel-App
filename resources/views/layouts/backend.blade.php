@@ -1,8 +1,4 @@
-<!--
-|--------------------------------------------------------------------------
-| resources/views/layouts/backend.blade.php *** Copyright netprogs.pl | avaiable only at Udemy.com | further distribution is prohibited  ***
-|--------------------------------------------------------------------------
--->
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -24,7 +20,7 @@
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
     <script src="http://getbootstrap.com/assets/js/ie-emulation-modes-warning.js"></script>
 
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">  <!-- Lecture 5  -->
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -32,12 +28,9 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <!-- Lecture 27 -->
     <script>
-        var base_url = '{{ url('/admin') }}'; <?php /* Lecture 32 admin argument */?>
+        var base_url = '{{ url('/admin') }}';
 
-
-        <!-- Lecture 34 -->
         <?php
         if (isset($_COOKIE['scroll_val'])) {
 
@@ -66,21 +59,31 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
+
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="button__badge">2</span> <span class="glyphicon glyphicon-envelope"></span> <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li class="unread_notification"><a href="#">John Doe reserved room number 26 in X object on 10/20/2017</a></li>
-                        <li><a href="#">John Doe canceled his reservation for room number 4 in X object on 010/15/201</a></li>
-                        <li class="unread_notification"><a href="#">John Doe reserved room number 7 in X object on 09/30/2017</a></li>
-                        <li><a href="#">Your reservation for room number 6 in the X object on 09/12/2017 has been confirmed</a></li>
-                        <li><a href="#">Your reservation for room number 9 in the X object on 08/29/2017 has been canceled</a></li>
-                        <li><a href="#">Your reservation for room number 10 in the X object on 08/28/2017 has been canceled</a></li>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        @if( $ncounter = count($notifications->where('status',0)) )
+                            <span id="app-notifications-count" class="button__badge">{{ $ncounter }}</span>
+                        @else
+                            <span id="app-notifications-count" class="button__badge hidden">0</span>
+                        @endif
+                        <span class="glyphicon glyphicon-envelope"></span> <span class="caret"></span></a>
+                    <ul id="app-notifications-list" class="dropdown-menu">
+                        @foreach( $notifications as $notification )
+                            @if($notification->status)
+                                <li><a>{{ $notification->content }}</a></li>
+                            @else
+                                <li class="unread_notification"><a href="{{ $notification->id }}">{{ $notification->content }}</a></li>
+                            @endif
+
+                        @endforeach
+
                     </ul>
                 </li>
-                <li><p class="navbar-text">{{ Auth::user()->FullName /* Lecture 34 */ }}</p></li>
+
+                <li><p class="navbar-text">{{ Auth::user()->FullName }}</p></li>
                 <li><a href="{{ route('profile') }}">Profile</a></li>
 
-                <!-- Lecture 34 -->
                 <li>
                     <a href="{{ route('logout') }}"
                        onclick="event.preventDefault();
@@ -89,7 +92,7 @@
                     </a>
 
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        {{ csrf_field() }}
+                        @csrf
                     </form>
                 </li>
 
@@ -103,18 +106,33 @@
         <div class="col-sm-3 col-md-2 sidebar">
             <ul class="nav nav-sidebar">
                 <li class="active"><a href="{{ route('adminHome') }}">Booking calendar <span class="sr-only">(current)</span></a></li>
-                <li><a href="{{ route('myObjects') }}">My tourist objects</a></li>
-                <li><a href="{{ route('saveObject') }}">Add a new tourist object</a></li>
-                <li><a href="{{ route('cities.index') }}">Cities</a></li>
+
+                @if( Auth::user()->hasRole(['owner','admin'])  )
+                    <li><a href="{{ route('myObjects') }}">My tourist objects</a></li>
+                    <li><a href="{{ route('saveObject') }}">Add a new tourist object</a></li>
+                @endif
+                @if( Auth::user()->hasRole(['admin']) )
+                    <li><a href="{{ route('cities.index') }}">Cities</a></li>
+                @endif
+
             </ul>
         </div>
 
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
+            @if ($errors->any())
+                <br>
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-            <br> <!-- Lecture 35 -->
+            <br>
 
-            <!-- Lecture 35 -->
             @if(Session::has('message'))
                 <br>
                 <div class="alert {{ Session::get('alert-class', 'alert-info') }} alert-dismissible show" role="alert">
@@ -125,7 +143,7 @@
                 </div>
         @endif
 
-        @yield('content') <!-- Lecture 5 -->
+        @yield('content')
         </div>
     </div>
 </div>
@@ -141,11 +159,17 @@
 <script src="http://getbootstrap.com/assets/js/vendor/holder.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
-<script src="{{ asset('js/app.js') }}"></script> <!-- Lecture 5 -->
-<script src="{{ asset('js/admin.js') }}"></script> <!-- Lecture 5 -->
-@stack('scripts') <!-- Lecture 30 -->
 
-<!-- Lecture 34 -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="{{ asset('js/app.js') }}"></script>
+<script src="{{ asset('js/admin.js') }}"></script>
+@stack('scripts')
+
+
 <script>
 
     $(function () {
