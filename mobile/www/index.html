@@ -16,22 +16,19 @@
 
     <link href="css/styles.css" rel="stylesheet"/>
 
+
     <script>
         var _app = {
-            // Application Constructor
             initialize: function() {
                 document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
             },
 
-            // deviceready Event Handler
-            //
-            // Bind any cordova events here. Common events are:
-            // 'pause', 'resume', etc.
+
             onDeviceReady: function() {
                 this.receivedEvent('deviceready');
             },
 
-            // Update DOM on a Received Event
+
             receivedEvent: function(id) {
                 var parentElement = document.getElementById(id);
                 var listeningElement = parentElement.querySelector('.listening');
@@ -97,7 +94,7 @@
 
     </script>
     <script src="js/app.js"></script>
-    <script src="js/html.js"></script> 
+    <script src="js/html.js"></script>
     <script src="js/control.js"></script>
 
     <title>Enjoy the trip!</title>
@@ -116,7 +113,7 @@
             <div data-role="navbar">
                 <ul>
                     <li><a href="#homepage" data-transition="none">Home</a></li>
-                    <li><a href="#adminpage" data-transition="none">Admin </a></li>
+                    <li><a href="#adminpage" data-transition="none" id="adminhref">Admin </a></li>
                     <li><a href="#loginpage" data-transition="none" id="loginhref">Sign in</a></li>
                 </ul>
             </div>
@@ -127,9 +124,6 @@
                 <input id="inset-autocomplete-input" name="city" data-type="search" placeholder="Search city...">
         </form>
         <ul data-role="listview" id="citysearchresults" data-inset="true" data-filter="true" data-filter-reveal="true" data-input="#inset-autocomplete-input">
-            <li><a href="#">Chicago</a></li>
-            <li><a href="#">Melbourne</a></li>
-            <li><a href="#">Kuala Lumpur</a></li>
         </ul>
 
         <label for="checkin">Check in:</label>
@@ -153,23 +147,12 @@
 
 
         <h1>Interesting places</h1>
-        <ul data-role="listview" data-inset="true">
-            <li><a href="#objectdetails" data-transition="none">
-                <img  alt="" src="img/placeholder.jpg">
-                <h2>Broken Bells <small>Prague</small></h2>
-                <p>Object description</p></a>
-            </li>
-            <li><a href="#objectdetails" data-transition="none">
-                <img  alt="" src="img/placeholder.jpg">
-                <h2>Broken Bells <small>Prague</small></h2>
-                <p>Object description</p></a>
-            </li>
-            <li><a href="#objectdetails" data-transition="none">
-                <img  alt="" src="img/placeholder.jpg">
-                <h2>Broken Bells <small>Prague</small></h2>
-                <p>Object description</p></a>
-            </li>
-        </ul>
+        <div id="objectsForMainPage">
+
+
+            <ul data-role="listview" data-inset="true">
+            </ul>
+        </div>
 
 
     </div>
@@ -192,30 +175,6 @@
 
         <div id="objectdata">
 
-            <h1>X object <small>address</small></h1>
-            <p>Id ut nostrum ipsam quis dicta sed maxime. Natus quibusdam beatae qui placeat nulla doloremque.</p>
-            <p>Available rooms in the object:</p>
-
-            <ul data-role="listview" data-split-icon="gear" data-split-theme="a" data-inset="true">
-                <li><a href="#room" data-transition="none">
-                    <img alt="" src="img/placeholder.jpg">
-                    <h2>Room 17 <small>Miami</small></h2>
-                    <p>Room description</p>
-                </a>
-                </li>
-                <li><a href="#room" data-transition="none">
-                    <img alt="" src="img/placeholder.jpg">
-                    <h2>Room 17 <small>Miami</small></h2>
-                    <p>Room description</p>
-                </a>
-                </li>
-                <li><a href="#room" data-transition="none">
-                    <img alt="" src="img/placeholder.jpg">
-                    <h2>Room 17 <small>Miami</small></h2>
-                    <p>Room description</p>
-                </a>
-                </li>
-            </ul>
 
         </div>
 
@@ -237,12 +196,6 @@
 
         <div id="roomdata">
             <ul data-role="listview" data-inset="true">
-                <li data-role="list-divider">Room number 12 in X object</li>
-                <li>
-                    <h2>Room size: 3, price 250$</h2>
-                    <p><strong>Room address</strong></p>
-                    <p>Room description</p>
-                </li>
             </ul>
         </div>
 
@@ -269,10 +222,6 @@
 <div data-role="page" id="adminpage">
     <div data-role="panel" id="notifications">
         <ul>
-            <li><a href="#">A reservation was made for room 12 in the Optio object. Check in 08/03/2017 , check out 08/06/2017</a></li>
-            <li><a href="#">A reservation was made for room 12 in the Optio object. Check in 08/03/2017 , check out 08/06/201</a></li>
-            <li><a href="#">A reservation was made for room 12 in the Optio object. Check in 08/03/2017 , check out 08/06/201</a></li>
-            <li><a href="#">A reservation was made for room 12 in the Optio object. Check in 08/03/2017 , check out 08/06/201</a></li>
         </ul>
     </div>
 
@@ -280,43 +229,6 @@
         <div id="user-reservations">
             <ul data-role="listview" data-inset="true">
 
-                <li data-role="list-divider">Voluptatem object</li>
-                <li>
-                    <h2>Room 18</h2>
-                    <p>Check in: 08/14/2017</p>
-                    <p>Check out: 08/30/2017</p>
-                    <p>Guest: John Doe</p>
-                    <p>Confirmed <a class="deleteReservation ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-id="1">Delete</a></p>
-                    <p>Check in: 08/14/2017</p>
-                    <p>Check out: 08/30/2017</p>
-                    <p>Guest: John Doe</p>
-                    <p>Confirmed <a class="deleteReservation ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-id="1">Delete</a></p>
-                </li>
-                <li>
-                    <h2>Room 20</h2>
-                    <p>Check in: 08/14/2017</p>
-                    <p>Check out: 08/30/2017</p>
-                    <p>Guest: John Doe</p>
-                    <p>Confirmed <a class="deleteReservation ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-id="1">Delete</a></p>
-                </li>
-
-
-
-                <li data-role="list-divider">Optio object</li>
-                <li>
-                    <h2>Room 18</h2>
-                    <p>Check in: 08/14/2017</p>
-                    <p>Check out: 08/30/2017</p>
-                    <p>Guest: John Doe</p>
-                    <p><a href="#">Confirm</a> <a class="deleteReservation ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-id="1">Delete</a></p>
-                </li>
-                <li>
-                    <h2>Room 20</h2>
-                    <p>Check in: 08/14/2017</p>
-                    <p>Check out: 08/30/2017</p>
-                    <p>Guest: John Doe</p>
-                    <p>Confirmed <a class="deleteReservation ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-id="1">Delete</a></p>
-                </li>
 
             </ul>
         </div>
